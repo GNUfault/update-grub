@@ -31,21 +31,23 @@ int is_root() {
     return geteuid() == 0;
 }
 
-const char* detect_distro_efi_path() {
+const char* detect_distro_name() {
     FILE *fp = fopen("/etc/os-release", "r");
-    if (!fp) return "/boot/efi/EFI/BOOT/grub.cfg";
+    if (!fp) return "unknown";
 
     char line[256];
     while (fgets(line, sizeof(line), fp)) {
         if (strncmp(line, "ID=", 3) == 0) {
-            if (strstr(line, "fedora")) return "/boot/efi/EFI/fedora/grub.cfg";
-            if (strstr(line, "almalinux")) return "/boot/efi/EFI/almalinux/grub.cfg";
-            if (strstr(line, "rocky")) return "/boot/efi/EFI/rocky/grub.cfg";
+            fclose(fp);
+            if (strstr(line, "fedora")) return "Fedora";
+            if (strstr(line, "almalinux")) return "AlmaLinux";
+            if (strstr(line, "rocky")) return "Rocky Linux";
+            return "Other";
         }
     }
 
     fclose(fp);
-    return "/boot/efi/EFI/BOOT/grub.cfg";
+    return "unknown";
 }
 
 int main() {

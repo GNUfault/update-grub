@@ -19,8 +19,8 @@ sudo make
 
 And there you go you can run `update-grub` when you please.
 
-And then for removing it you just run
+And then for removing it you just run:
 ```
 sudo make remove
 ```
-In the project's root
+In the project's root.

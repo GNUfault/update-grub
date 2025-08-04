@@ -54,7 +54,7 @@ int main() {
         return 1;
     }
 
-    printf("🔍 Boot mode: %s\n", is_uefi() ? "UEFI" : "BIOS");
+    printf("Boot mode: %s\n", is_uefi() ? "UEFI" : "BIOS");
 
     int status = system("grub2-mkconfig -o /boot/grub2/grub.cfg");
     if (status != 0) {

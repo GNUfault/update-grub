@@ -20,6 +20,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/stat.h>
+#include <string.h>
 
 int is_uefi() {
     struct stat st;
@@ -30,13 +31,30 @@ int is_root() {
     return geteuid() == 0;
 }
 
+const char* detect_distro_efi_path() {
+    FILE *fp = fopen("/etc/os-release", "r");
+    if (!fp) return "/boot/efi/EFI/BOOT/grub.cfg";
+
+    char line[256];
+    while (fgets(line, sizeof(line), fp)) {
+        if (strncmp(line, "ID=", 3) == 0) {
+            if (strstr(line, "fedora")) return "/boot/efi/EFI/fedora/grub.cfg";
+            if (strstr(line, "almalinux")) return "/boot/efi/EFI/almalinux/grub.cfg";
+            if (strstr(line, "rocky")) return "/boot/efi/EFI/rocky/grub.cfg";
+        }
+    }
+
+    fclose(fp);
+    return "/boot/efi/EFI/BOOT/grub.cfg";
+}
+
 int main() {
     if (!is_root()) {
-        fprintf(stderr, "Error: This script must be run as root.\n");
+        fprintf(stderr, "This tool must be run as root.\n");
         return 1;
     }
 
-    printf("Detected boot mode: %s\n", is_uefi() ? "UEFI" : "BIOS");
+    printf("🔍 Boot mode: %s\n", is_uefi() ? "UEFI" : "BIOS");
 
     int status = system("grub2-mkconfig -o /boot/grub2/grub.cfg");
     if (status != 0) {
@@ -45,9 +63,13 @@ int main() {
     }
 
     if (is_uefi()) {
-        status = system("grub2-mkconfig -o /boot/efi/EFI/almalinux/grub.cfg");
+        const char* efi_path = detect_distro_efi_path();
+        printf("Detected EFI target: %s\n", efi_path);
+        char cmd[256];
+        snprintf(cmd, sizeof(cmd), "grub2-mkconfig -o %s", efi_path);
+        status = system(cmd);
         if (status != 0) {
-            fprintf(stderr, "Failed to generate /boot/efi/EFI/almalinux/grub.cfg\n");
+            fprintf(stderr, "Failed to generate %s\n", efi_path);
             return status;
         }
     }

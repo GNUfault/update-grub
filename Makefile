@@ -3,7 +3,7 @@ CC=gcc
 OPT=s
 SRC=main.c
 BIN=update-grub
-INS=/usr/local/bin/$(BIN)
+INS=/usr/local/sbin/$(BIN)
 
 all: check-for-root clean compile strip install
 

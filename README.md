@@ -3,13 +3,13 @@
 
 You need:
 ```
-git make gcc sudo install strip
+git make gcc sudo install
 ```
 and also `grub` but why would you use this if you did not?
 
 Then clone it:
 ```
-git clone https://github.com/bluMATRIKZ/update-grub.git cd update-grub
+git clone https://github.com/GNUfault/update-grub.git cd update-grub
 ```
 
 Then compile and install it
